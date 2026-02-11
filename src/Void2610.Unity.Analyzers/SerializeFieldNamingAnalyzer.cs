@@ -9,8 +9,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class SerializeFieldNamingAnalyzer : DiagnosticAnalyzer
     {
         // 通常のprivateフィールドに_プレフィックスがない場合の警告
-        public static readonly DiagnosticDescriptor VUA0001 = new DiagnosticDescriptor(
-            "VUA0001",
+        public static readonly DiagnosticDescriptor VUA0008 = new DiagnosticDescriptor(
+            "VUA0008",
             "privateフィールドには'_'プレフィックスが必要です",
             "privateフィールド '{0}' には '_' プレフィックスを付けてください",
             "Naming",
@@ -27,7 +27,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0001, VUA0002);
+            ImmutableArray.Create(VUA0008, VUA0002);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -69,7 +69,7 @@ namespace Void2610.Unity.Analyzers
                 if (!startsWithUnderscore)
                 {
                     context.ReportDiagnostic(
-                        Diagnostic.Create(VUA0001, field.Locations[0], field.Name));
+                        Diagnostic.Create(VUA0008, field.Locations[0], field.Name));
                 }
             }
         }

@@ -31,14 +31,14 @@ public class TestClass
         }
 
         [Fact]
-        public async Task PrivateFieldWithoutUnderscore_VUA0001()
+        public async Task PrivateFieldWithoutUnderscore_VUA0008()
         {
             var test = SerializeFieldAttribute + @"
 public class TestClass
 {
     private int {|#0:health|};
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA0008")
                 .WithLocation(0)
                 .WithArguments("health");
             await Verify.VerifyAnalyzerAsync(test, expected);
