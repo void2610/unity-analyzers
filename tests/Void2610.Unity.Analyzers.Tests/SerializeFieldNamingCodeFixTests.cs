@@ -9,12 +9,14 @@ namespace Void2610.Unity.Analyzers.Tests
 {
     public class SerializeFieldNamingCodeFixTests
     {
-        // テスト用のSerializeField属性定義
+        // テスト用のUnity属性定義
         private const string SerializeFieldAttribute = @"
 namespace UnityEngine
 {
     [System.AttributeUsage(System.AttributeTargets.Field)]
     public class SerializeField : System.Attribute { }
+    [System.AttributeUsage(System.AttributeTargets.Field)]
+    public class SerializeReference : System.Attribute { }
 }
 ";
 
@@ -75,6 +77,26 @@ public class TestClass
             var expected = Verify.Diagnostic("VUA0008")
                 .WithLocation(0)
                 .WithArguments("count");
+            await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
+        }
+
+        [Fact]
+        public async Task VUA0002_SerializeReference_RemoveUnderscorePrefix()
+        {
+            // [SerializeReference] _myRef → myRef
+            var test = SerializeFieldAttribute + @"
+public class TestClass
+{
+    [UnityEngine.SerializeReference] private object {|#0:_myRef|};
+}";
+            var fixedCode = SerializeFieldAttribute + @"
+public class TestClass
+{
+    [UnityEngine.SerializeReference] private object myRef;
+}";
+            var expected = Verify.Diagnostic("VUA0002")
+                .WithLocation(0)
+                .WithArguments("_myRef");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
     }

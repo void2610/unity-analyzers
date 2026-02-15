@@ -10,12 +10,14 @@ namespace Void2610.Unity.Analyzers.Tests
 {
     public class SerializeFieldNamingAnalyzerTests
     {
-        // テスト用のSerializeField属性定義
+        // テスト用のUnity属性定義
         private const string SerializeFieldAttribute = @"
 namespace UnityEngine
 {
     [System.AttributeUsage(System.AttributeTargets.Field)]
     public class SerializeField : System.Attribute { }
+    [System.AttributeUsage(System.AttributeTargets.Field)]
+    public class SerializeReference : System.Attribute { }
 }
 ";
 
@@ -111,6 +113,31 @@ public class TestClass
     internal int health;
 }";
             await Verify.VerifyAnalyzerAsync(test);
+        }
+
+        [Fact]
+        public async Task SerializeReferenceWithoutUnderscore_NoDiagnostic()
+        {
+            var test = SerializeFieldAttribute + @"
+public class TestClass
+{
+    [UnityEngine.SerializeReference] private object myRef;
+}";
+            await Verify.VerifyAnalyzerAsync(test);
+        }
+
+        [Fact]
+        public async Task SerializeReferenceWithUnderscore_VUA0002()
+        {
+            var test = SerializeFieldAttribute + @"
+public class TestClass
+{
+    [UnityEngine.SerializeReference] private object {|#0:_myRef|};
+}";
+            var expected = Verify.Diagnostic("VUA0002")
+                .WithLocation(0)
+                .WithArguments("_myRef");
+            await Verify.VerifyAnalyzerAsync(test, expected);
         }
     }
 }

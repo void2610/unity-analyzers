@@ -50,8 +50,8 @@ namespace Void2610.Unity.Analyzers
                 return;
 
             var hasSerializeField = field.GetAttributes().Any(a =>
-                a.AttributeClass?.Name == "SerializeField" ||
-                a.AttributeClass?.Name == "SerializeFieldAttribute");
+                a.AttributeClass?.Name is "SerializeField" or "SerializeFieldAttribute"
+                    or "SerializeReference" or "SerializeReferenceAttribute");
 
             var startsWithUnderscore = field.Name.StartsWith("_");
 
