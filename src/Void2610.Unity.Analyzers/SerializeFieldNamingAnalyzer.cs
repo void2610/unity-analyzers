@@ -38,6 +38,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeField(SymbolAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Symbol)) return;
             var field = (IFieldSymbol)context.Symbol;
 
             // privateフィールドのみ対象

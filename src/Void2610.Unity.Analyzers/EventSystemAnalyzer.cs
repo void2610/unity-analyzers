@@ -31,6 +31,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeEvent(SymbolAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Symbol)) return;
             var eventSymbol = (IEventSymbol)context.Symbol;
 
             // コンパイラ生成は除外
@@ -43,6 +44,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeField(SymbolAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Symbol)) return;
             var field = (IFieldSymbol)context.Symbol;
 
             // コンパイラ生成フィールドは除外（eventのバッキングフィールドなど）
@@ -58,6 +60,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeProperty(SymbolAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Symbol)) return;
             var property = (IPropertySymbol)context.Symbol;
 
             if (IsActionOrFuncType(property.Type))

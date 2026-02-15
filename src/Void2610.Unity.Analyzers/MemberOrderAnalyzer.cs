@@ -94,6 +94,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeTypeDeclaration(SyntaxNodeAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Node.SyntaxTree)) return;
             var typeDeclaration = (TypeDeclarationSyntax)context.Node;
             var members = typeDeclaration.Members;
 

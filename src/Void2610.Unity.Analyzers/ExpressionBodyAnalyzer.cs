@@ -31,6 +31,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeMethod(SyntaxNodeAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Node.SyntaxTree)) return;
             var method = (MethodDeclarationSyntax)context.Node;
 
             // 既に式本体の場合は除外

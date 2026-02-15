@@ -31,6 +31,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Node.SyntaxTree)) return;
             var ifStatement = (IfStatementSyntax)context.Node;
 
             // elseがある場合は対象外

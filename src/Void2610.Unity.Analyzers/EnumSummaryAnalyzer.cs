@@ -31,6 +31,7 @@ namespace Void2610.Unity.Analyzers
 
         private static void AnalyzeEnumMember(SyntaxNodeAnalysisContext context)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Node.SyntaxTree)) return;
             var enumMember = (EnumMemberDeclarationSyntax)context.Node;
 
             // 親がトップレベルenumかチェック（クラス内ネストは除外）

@@ -83,6 +83,7 @@ namespace Void2610.Unity.Analyzers
         private static void ReportIfSerializeField(
             SyntaxNodeAnalysisContext context, ExpressionSyntax expression, Location location)
         {
+            if (GeneratedCodeHelper.IsGenerated(context.Node.SyntaxTree)) return;
             var symbol = context.SemanticModel.GetSymbolInfo(expression).Symbol;
             if (!(symbol is IFieldSymbol field))
                 return;
