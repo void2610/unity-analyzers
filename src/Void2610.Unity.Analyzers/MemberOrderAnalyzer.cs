@@ -21,7 +21,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         // メンバーカテゴリ定義
-        private enum MemberCategory
+        internal enum MemberCategory
         {
             NestedEnum = 0,
             SerializeField = 1,
@@ -146,7 +146,7 @@ namespace Void2610.Unity.Analyzers
             }
         }
 
-        private static MemberCategory ClassifyMember(MemberDeclarationSyntax member)
+        internal static MemberCategory ClassifyMember(MemberDeclarationSyntax member)
         {
             switch (member)
             {
