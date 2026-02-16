@@ -41,8 +41,12 @@ namespace Void2610.Unity.Analyzers
                 return;
 
             // XMLドキュメントコメントの有無をチェック
+            // DocumentationModeによっては///がSingleLineCommentTriviaとして解析されるため両方チェック
             var hasDocComment = enumMember.GetLeadingTrivia()
-                .Any(t => t.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia));
+                .Any(t => t.IsKind(SyntaxKind.SingleLineDocumentationCommentTrivia)
+                    || (t.IsKind(SyntaxKind.SingleLineCommentTrivia)
+                        && t.ToString().StartsWith("///")
+                        && t.ToString().Contains("<summary>")));
 
             if (!hasDocComment)
             {
