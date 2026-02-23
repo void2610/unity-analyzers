@@ -44,7 +44,7 @@ public class TestClass
         _handle.TryCancel();
     }
 }";
-            var expected = Verify.Diagnostic("VUA0007")
+            var expected = Verify.Diagnostic("VUA1003")
                 .WithLocation(0)
                 .WithArguments("_handle");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
@@ -72,7 +72,7 @@ public class TestClass
         _handle.TryCancel();
     }
 }";
-            var expected = Verify.Diagnostic("VUA0007")
+            var expected = Verify.Diagnostic("VUA1003")
                 .WithLocation(0)
                 .WithArguments("_handle");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);

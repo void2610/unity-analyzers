@@ -11,8 +11,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class MotionHandleTryCancelAnalyzer : DiagnosticAnalyzer
     {
         // if(handle.IsActive()) handle.Cancel() パターンを検出し、TryCancelの使用を推奨
-        public static readonly DiagnosticDescriptor VUA0007 = new DiagnosticDescriptor(
-            "VUA0007",
+        public static readonly DiagnosticDescriptor VUA1003 = new DiagnosticDescriptor(
+            "VUA1003",
             "MotionHandleにはTryCancel()を使用してください",
             "'{0}' に対して if(IsActive()) Cancel() ではなく TryCancel() を使用してください",
             "Design",
@@ -20,7 +20,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0007);
+            ImmutableArray.Create(VUA1003);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -58,7 +58,7 @@ namespace Void2610.Unity.Analyzers
                 return;
 
             context.ReportDiagnostic(Diagnostic.Create(
-                VUA0007,
+                VUA1003,
                 ifStatement.GetLocation(),
                 conditionTarget.ToString()));
         }

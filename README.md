@@ -7,15 +7,15 @@ Unity プロジェクト向けのカスタム Roslyn アナライザー集です
 
 | ID | カテゴリ | 重大度 | 説明 |
 |---|---|---|---|
-| VUA0001 | Design | Warning | `[SerializeField]` フィールドに対する防御的 null チェックを禁止 |
-| VUA0002 | Naming | Warning | `[SerializeField]` フィールドに `_` プレフィックスを付けない |
-| VUA0003 | Design | Warning | C# 標準イベント/デリゲート禁止（R3 の `Subject<T>` を使用） |
-| VUA0004 | Style | Warning | 単一文の public メソッドには式本体 (`=>`) を使用 |
-| VUA0005 | Style | Warning | クラスメンバーの宣言順序を強制 |
-| VUA0006 | Documentation | Warning | トップレベル enum メンバーに `/// <summary>` コメント必須 |
-| VUA0007 | Design | Warning | `if(IsActive()) Cancel()` ではなく `TryCancel()` を使用 |
-| VUA0008 | Naming | Warning | private フィールドに `_` プレフィックス必須 |
-| VUA0009 | Design | Warning | `StartCoroutine` の使用を禁止（UniTask などの代替を使用） |
+| VUA1001 | Design | Warning | `[SerializeField]` フィールドに対する防御的 null チェックを禁止 |
+| VUA1002 | Design | Warning | C# 標準イベント/デリゲート禁止（R3 の `Subject<T>` を使用） |
+| VUA1003 | Design | Warning | `if(IsActive()) Cancel()` ではなく `TryCancel()` を使用 |
+| VUA1004 | Design | Warning | `StartCoroutine` の使用を禁止（UniTask などの代替を使用） |
+| VUA2001 | Naming | Warning | `[SerializeField]` フィールドに `_` プレフィックスを付けない |
+| VUA2002 | Naming | Warning | private フィールドに `_` プレフィックス必須 |
+| VUA3001 | Style | Warning | 単一文の public メソッドには式本体 (`=>`) を使用 |
+| VUA3002 | Style | Warning | クラスメンバーの宣言順序を強制 |
+| VUA4001 | Documentation | Warning | トップレベル enum メンバーに `/// <summary>` コメント必須 |
 
 ## 使用方法
 
@@ -42,9 +42,9 @@ git submodule add <repository-url> Assets/Plugins/Analyzers/unity-analyzers
 特定の箇所でルールを無効化したい場合は `#pragma warning disable` を使用します:
 
 ```csharp
-#pragma warning disable VUA0001
+#pragma warning disable VUA1001
 // ここでは警告が出ない
-#pragma warning restore VUA0001
+#pragma warning restore VUA1001
 ```
 
 ## テスト

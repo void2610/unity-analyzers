@@ -24,7 +24,7 @@ public enum GameState
     /// <summary>  </summary>
     Idle
 }";
-            var expected = Verify.Diagnostic("VUA0006")
+            var expected = Verify.Diagnostic("VUA4001")
                 .WithLocation(0)
                 .WithArguments("Idle");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
