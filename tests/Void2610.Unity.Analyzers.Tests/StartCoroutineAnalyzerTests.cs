@@ -32,7 +32,6 @@ namespace UnityEngine
         {
             // this.StartCoroutine(...) → 検出
             var test = MonoBehaviourStub + @"
-using System.Collections;
 public class TestClass : UnityEngine.MonoBehaviour
 {
     public void Method()
@@ -51,7 +50,6 @@ public class TestClass : UnityEngine.MonoBehaviour
         {
             // StartCoroutine(...) (thisなし) → 検出
             var test = MonoBehaviourStub + @"
-using System.Collections;
 public class TestClass : UnityEngine.MonoBehaviour
 {
     public void Method()
@@ -70,7 +68,6 @@ public class TestClass : UnityEngine.MonoBehaviour
         {
             // StartCoroutine("MethodName") → 検出
             var test = MonoBehaviourStub + @"
-using System.Collections;
 public class TestClass : UnityEngine.MonoBehaviour
 {
     public void Method()
@@ -89,7 +86,6 @@ public class TestClass : UnityEngine.MonoBehaviour
         {
             // other.StartCoroutine(...) → 検出
             var test = MonoBehaviourStub + @"
-using System.Collections;
 public class TestClass : UnityEngine.MonoBehaviour
 {
     private UnityEngine.MonoBehaviour _other;
