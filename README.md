@@ -15,6 +15,7 @@ Unity プロジェクト向けのカスタム Roslyn アナライザー集です
 | VUA0006 | Documentation | Warning | トップレベル enum メンバーに `/// <summary>` コメント必須 |
 | VUA0007 | Design | Warning | `if(IsActive()) Cancel()` ではなく `TryCancel()` を使用 |
 | VUA0008 | Naming | Warning | private フィールドに `_` プレフィックス必須 |
+| VUA0009 | Design | Warning | `StartCoroutine` の使用を禁止（UniTask などの代替を使用） |
 
 ## 使用方法
 
