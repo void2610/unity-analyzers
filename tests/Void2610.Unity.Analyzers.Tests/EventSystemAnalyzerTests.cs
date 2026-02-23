@@ -11,7 +11,7 @@ namespace Void2610.Unity.Analyzers.Tests
     public class EventSystemAnalyzerTests
     {
         [Fact]
-        public async Task EventKeyword_VUA0003()
+        public async Task EventKeyword_VUA1002()
         {
             var test = @"
 using System;
@@ -19,14 +19,14 @@ public class TestClass
 {
     public event EventHandler {|#0:OnDamaged|};
 }";
-            var expected = Verify.Diagnostic("VUA0003")
+            var expected = Verify.Diagnostic("VUA1002")
                 .WithLocation(0)
                 .WithArguments("OnDamaged");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task ActionField_VUA0003()
+        public async Task ActionField_VUA1002()
         {
             var test = @"
 using System;
@@ -34,14 +34,14 @@ public class TestClass
 {
     private Action {|#0:_onDamaged|};
 }";
-            var expected = Verify.Diagnostic("VUA0003")
+            var expected = Verify.Diagnostic("VUA1002")
                 .WithLocation(0)
                 .WithArguments("_onDamaged");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task GenericActionField_VUA0003()
+        public async Task GenericActionField_VUA1002()
         {
             var test = @"
 using System;
@@ -49,14 +49,14 @@ public class TestClass
 {
     private Action<int> {|#0:_onHealthChanged|};
 }";
-            var expected = Verify.Diagnostic("VUA0003")
+            var expected = Verify.Diagnostic("VUA1002")
                 .WithLocation(0)
                 .WithArguments("_onHealthChanged");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task FuncProperty_VUA0003()
+        public async Task FuncProperty_VUA1002()
         {
             var test = @"
 using System;
@@ -64,7 +64,7 @@ public class TestClass
 {
     public Func<int> {|#0:GetValue|} { get; set; }
 }";
-            var expected = Verify.Diagnostic("VUA0003")
+            var expected = Verify.Diagnostic("VUA1002")
                 .WithLocation(0)
                 .WithArguments("GetValue");
             await Verify.VerifyAnalyzerAsync(test, expected);

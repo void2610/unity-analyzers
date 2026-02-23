@@ -15,7 +15,7 @@ namespace Void2610.Unity.Analyzers
     public sealed class SerializeFieldNamingCodeFixProvider : CodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds =>
-            ImmutableArray.Create("VUA0002", "VUA0008");
+            ImmutableArray.Create("VUA2001", "VUA2002");
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -33,7 +33,7 @@ namespace Void2610.Unity.Analyzers
             string newName;
             string title;
 
-            if (diagnostic.Id == "VUA0002")
+            if (diagnostic.Id == "VUA2001")
             {
                 // [SerializeField]フィールド: _プレフィックス除去
                 newName = oldName.TrimStart('_');

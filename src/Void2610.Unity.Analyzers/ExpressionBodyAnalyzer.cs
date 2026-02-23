@@ -11,8 +11,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class ExpressionBodyAnalyzer : DiagnosticAnalyzer
     {
         // 単一文のpublicメソッドには式本体を使用するよう警告
-        public static readonly DiagnosticDescriptor VUA0004 = new DiagnosticDescriptor(
-            "VUA0004",
+        public static readonly DiagnosticDescriptor VUA3001 = new DiagnosticDescriptor(
+            "VUA3001",
             "単一文のpublicメソッドには式本体を使用してください",
             "メソッド '{0}' は単一文のため式本体 (=>) で記述してください",
             "Style",
@@ -20,7 +20,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0004);
+            ImmutableArray.Create(VUA3001);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -64,7 +64,7 @@ namespace Void2610.Unity.Analyzers
                 return;
 
             var diagnostic = Diagnostic.Create(
-                VUA0004,
+                VUA3001,
                 method.Identifier.GetLocation(),
                 method.Identifier.Text);
             context.ReportDiagnostic(diagnostic);

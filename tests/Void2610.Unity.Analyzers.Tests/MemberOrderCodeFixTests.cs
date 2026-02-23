@@ -27,7 +27,7 @@ public class TestClass
     public int Value { get; set; }
     private int _count;
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("Value", "public properties", "private fields");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
@@ -61,7 +61,7 @@ public class TestClass
 
     public int GetValue() => _count;
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("TestClass", "constructors", "public methods (one line)");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
@@ -101,7 +101,7 @@ public class TestClass
         _count = 0;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("Awake", "Unity events", "cleanup");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);

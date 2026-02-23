@@ -20,7 +20,7 @@ namespace UnityEngine
 ";
 
         [Fact]
-        public async Task SerializeFieldEqualsNull_VUA0001()
+        public async Task SerializeFieldEqualsNull_VUA1001()
         {
             // field == null → 検出
             var test = SerializeFieldAttribute + @"
@@ -32,14 +32,14 @@ public class TestClass
         if ({|#0:target == null|}) return;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task SerializeFieldNotEqualsNull_VUA0001()
+        public async Task SerializeFieldNotEqualsNull_VUA1001()
         {
             // field != null → 検出
             var test = SerializeFieldAttribute + @"
@@ -51,14 +51,14 @@ public class TestClass
         if ({|#0:target != null|}) { }
     }
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task NullEqualsSerializeField_VUA0001()
+        public async Task NullEqualsSerializeField_VUA1001()
         {
             // null == field → 検出
             var test = SerializeFieldAttribute + @"
@@ -70,14 +70,14 @@ public class TestClass
         if ({|#0:null == target|}) return;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task SerializeFieldConditionalAccess_VUA0001()
+        public async Task SerializeFieldConditionalAccess_VUA1001()
         {
             // field?.Method() → 検出
             var test = SerializeFieldAttribute + @"
@@ -89,14 +89,14 @@ public class TestClass
         {|#0:target?.ToString()|};
     }
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task SerializeFieldCoalesce_VUA0001()
+        public async Task SerializeFieldCoalesce_VUA1001()
         {
             // field ?? fallback → 検出
             var test = SerializeFieldAttribute + @"
@@ -105,14 +105,14 @@ public class TestClass
     [UnityEngine.SerializeField] private string target;
     public string Method() => {|#0:target ?? ""fallback""|};
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task SerializeFieldIsNull_VUA0001()
+        public async Task SerializeFieldIsNull_VUA1001()
         {
             // field is null → 検出
             var test = SerializeFieldAttribute + @"
@@ -124,14 +124,14 @@ public class TestClass
         if ({|#0:target is null|}) return;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task SerializeFieldIsNotNull_VUA0001()
+        public async Task SerializeFieldIsNotNull_VUA1001()
         {
             // field is not null → 検出
             var test = SerializeFieldAttribute + @"
@@ -143,7 +143,7 @@ public class TestClass
         if ({|#0:target is not null|}) { }
     }
 }";
-            var expected = Verify.Diagnostic("VUA0001")
+            var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);

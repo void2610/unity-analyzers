@@ -33,14 +33,14 @@ public class TestClass
         }
 
         [Fact]
-        public async Task PrivateFieldWithoutUnderscore_VUA0008()
+        public async Task PrivateFieldWithoutUnderscore_VUA2002()
         {
             var test = SerializeFieldAttribute + @"
 public class TestClass
 {
     private int {|#0:health|};
 }";
-            var expected = Verify.Diagnostic("VUA0008")
+            var expected = Verify.Diagnostic("VUA2002")
                 .WithLocation(0)
                 .WithArguments("health");
             await Verify.VerifyAnalyzerAsync(test, expected);
@@ -58,14 +58,14 @@ public class TestClass
         }
 
         [Fact]
-        public async Task SerializeFieldWithUnderscore_VUA0002()
+        public async Task SerializeFieldWithUnderscore_VUA2001()
         {
             var test = SerializeFieldAttribute + @"
 public class TestClass
 {
     [UnityEngine.SerializeField] private int {|#0:_maxHealth|};
 }";
-            var expected = Verify.Diagnostic("VUA0002")
+            var expected = Verify.Diagnostic("VUA2001")
                 .WithLocation(0)
                 .WithArguments("_maxHealth");
             await Verify.VerifyAnalyzerAsync(test, expected);
@@ -127,14 +127,14 @@ public class TestClass
         }
 
         [Fact]
-        public async Task SerializeReferenceWithUnderscore_VUA0002()
+        public async Task SerializeReferenceWithUnderscore_VUA2001()
         {
             var test = SerializeFieldAttribute + @"
 public class TestClass
 {
     [UnityEngine.SerializeReference] private object {|#0:_myRef|};
 }";
-            var expected = Verify.Diagnostic("VUA0002")
+            var expected = Verify.Diagnostic("VUA2001")
                 .WithLocation(0)
                 .WithArguments("_myRef");
             await Verify.VerifyAnalyzerAsync(test, expected);

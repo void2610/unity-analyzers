@@ -9,8 +9,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class EventSystemAnalyzer : DiagnosticAnalyzer
     {
         // C#標準のeventやAction/Funcフィールドの代わりにR3のSubjectを使用するよう警告
-        public static readonly DiagnosticDescriptor VUA0003 = new DiagnosticDescriptor(
-            "VUA0003",
+        public static readonly DiagnosticDescriptor VUA1002 = new DiagnosticDescriptor(
+            "VUA1002",
             "イベントにはR3のSubjectを使用してください",
             "'{0}' はC#標準のイベント/デリゲートです。R3のSubject<T>を使用してください",
             "Design",
@@ -18,7 +18,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0003);
+            ImmutableArray.Create(VUA1002);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -39,7 +39,7 @@ namespace Void2610.Unity.Analyzers
                 return;
 
             context.ReportDiagnostic(
-                Diagnostic.Create(VUA0003, eventSymbol.Locations[0], eventSymbol.Name));
+                Diagnostic.Create(VUA1002, eventSymbol.Locations[0], eventSymbol.Name));
         }
 
         private static void AnalyzeField(SymbolAnalysisContext context)
@@ -54,7 +54,7 @@ namespace Void2610.Unity.Analyzers
             if (IsActionOrFuncType(field.Type))
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(VUA0003, field.Locations[0], field.Name));
+                    Diagnostic.Create(VUA1002, field.Locations[0], field.Name));
             }
         }
 
@@ -66,7 +66,7 @@ namespace Void2610.Unity.Analyzers
             if (IsActionOrFuncType(property.Type))
             {
                 context.ReportDiagnostic(
-                    Diagnostic.Create(VUA0003, property.Locations[0], property.Name));
+                    Diagnostic.Create(VUA1002, property.Locations[0], property.Name));
             }
         }
 
