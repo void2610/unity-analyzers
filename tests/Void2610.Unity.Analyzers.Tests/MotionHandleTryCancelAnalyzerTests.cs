@@ -24,7 +24,7 @@ namespace LitMotion
 ";
 
         [Fact]
-        public async Task IfIsActiveThenCancel_WithBlock_VUA0007()
+        public async Task IfIsActiveThenCancel_WithBlock_VUA1003()
         {
             // if(handle.IsActive()) { handle.Cancel(); } → 検出
             var test = MotionHandleStub + @"
@@ -36,14 +36,14 @@ public class TestClass
         {|#0:if (_handle.IsActive()) { _handle.Cancel(); }|}
     }
 }";
-            var expected = Verify.Diagnostic("VUA0007")
+            var expected = Verify.Diagnostic("VUA1003")
                 .WithLocation(0)
                 .WithArguments("_handle");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task IfIsActiveThenCancel_WithoutBlock_VUA0007()
+        public async Task IfIsActiveThenCancel_WithoutBlock_VUA1003()
         {
             // if(handle.IsActive()) handle.Cancel(); → 検出
             var test = MotionHandleStub + @"
@@ -55,7 +55,7 @@ public class TestClass
         {|#0:if (_handle.IsActive()) _handle.Cancel();|}
     }
 }";
-            var expected = Verify.Diagnostic("VUA0007")
+            var expected = Verify.Diagnostic("VUA1003")
                 .WithLocation(0)
                 .WithArguments("_handle");
             await Verify.VerifyAnalyzerAsync(test, expected);
@@ -151,7 +151,7 @@ public class TestClass
         }
 
         [Fact]
-        public async Task NonMotionHandleIsActiveCancel_VUA0007()
+        public async Task NonMotionHandleIsActiveCancel_VUA1003()
         {
             // MotionHandle以外でも同パターンは検出（構文ベース）
             var test = @"
@@ -168,7 +168,7 @@ public class TestClass
         {|#0:if (_handle.IsActive()) _handle.Cancel();|}
     }
 }";
-            var expected = Verify.Diagnostic("VUA0007")
+            var expected = Verify.Diagnostic("VUA1003")
                 .WithLocation(0)
                 .WithArguments("_handle");
             await Verify.VerifyAnalyzerAsync(test, expected);

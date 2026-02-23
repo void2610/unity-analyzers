@@ -11,8 +11,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class SerializeFieldNullCheckAnalyzer : DiagnosticAnalyzer
     {
         // [SerializeField]フィールドに対する防御的nullチェックを禁止
-        public static readonly DiagnosticDescriptor VUA0001 = new DiagnosticDescriptor(
-            "VUA0001",
+        public static readonly DiagnosticDescriptor VUA1001 = new DiagnosticDescriptor(
+            "VUA1001",
             "[SerializeField]フィールドのnullチェックは不要です",
             "[SerializeField]フィールド '{0}' のnullチェックを削除してください。設定ミスは即座にクラッシュさせてください",
             "Design",
@@ -20,7 +20,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0001);
+            ImmutableArray.Create(VUA1001);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -94,7 +94,7 @@ namespace Void2610.Unity.Analyzers
 
             if (hasSerializeField)
             {
-                context.ReportDiagnostic(Diagnostic.Create(VUA0001, location, field.Name));
+                context.ReportDiagnostic(Diagnostic.Create(VUA1001, location, field.Name));
             }
         }
 

@@ -14,7 +14,7 @@ namespace Void2610.Unity.Analyzers
     public sealed class EnumSummaryCodeFixProvider : CodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds =>
-            ImmutableArray.Create("VUA0006");
+            ImmutableArray.Create("VUA4001");
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

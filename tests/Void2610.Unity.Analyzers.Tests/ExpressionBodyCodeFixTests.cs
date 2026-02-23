@@ -26,7 +26,7 @@ public class TestClass
 {
     public int GetValue() => 42;
 }";
-            var expected = Verify.Diagnostic("VUA0004")
+            var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
                 .WithArguments("GetValue");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
@@ -51,7 +51,7 @@ public class TestClass
     private int _value;
     public void SetValue(int v) => _value = v;
 }";
-            var expected = Verify.Diagnostic("VUA0004")
+            var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
                 .WithArguments("SetValue");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
@@ -76,7 +76,7 @@ public class TestClass
     private void DoWork() { }
     public void Execute() => DoWork();
 }";
-            var expected = Verify.Diagnostic("VUA0004")
+            var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
                 .WithArguments("Execute");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);

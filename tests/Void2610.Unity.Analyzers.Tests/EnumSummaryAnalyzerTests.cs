@@ -11,7 +11,7 @@ namespace Void2610.Unity.Analyzers.Tests
     public class EnumSummaryAnalyzerTests
     {
         [Fact]
-        public async Task TopLevelEnumMemberWithoutSummary_VUA0006()
+        public async Task TopLevelEnumMemberWithoutSummary_VUA4001()
         {
             // summaryなし → 検出
             var test = @"
@@ -22,10 +22,10 @@ public enum GameState
 }";
             var expected = new[]
             {
-                Verify.Diagnostic("VUA0006")
+                Verify.Diagnostic("VUA4001")
                     .WithLocation(0)
                     .WithArguments("ThemeAnnouncement"),
-                Verify.Diagnostic("VUA0006")
+                Verify.Diagnostic("VUA4001")
                     .WithLocation(1)
                     .WithArguments("CardDistribution"),
             };
@@ -48,7 +48,7 @@ public enum EmotionType
         }
 
         [Fact]
-        public async Task TopLevelEnumMemberWithLineCommentOnly_VUA0006()
+        public async Task TopLevelEnumMemberWithLineCommentOnly_VUA4001()
         {
             // //コメントのみ → 検出（///じゃないため）
             var test = @"
@@ -61,10 +61,10 @@ public enum GameState
 }";
             var expected = new[]
             {
-                Verify.Diagnostic("VUA0006")
+                Verify.Diagnostic("VUA4001")
                     .WithLocation(0)
                     .WithArguments("ThemeAnnouncement"),
-                Verify.Diagnostic("VUA0006")
+                Verify.Diagnostic("VUA4001")
                     .WithLocation(1)
                     .WithArguments("CardDistribution"),
             };

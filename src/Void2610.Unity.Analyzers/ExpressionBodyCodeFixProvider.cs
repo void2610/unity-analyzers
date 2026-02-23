@@ -15,7 +15,7 @@ namespace Void2610.Unity.Analyzers
     public sealed class ExpressionBodyCodeFixProvider : CodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds =>
-            ImmutableArray.Create("VUA0004");
+            ImmutableArray.Create("VUA3001");
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

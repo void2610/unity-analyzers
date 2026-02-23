@@ -21,7 +21,7 @@ namespace UnityEngine
 ";
 
         [Fact]
-        public async Task VUA0002_RemoveUnderscorePrefix()
+        public async Task VUA2001_RemoveUnderscorePrefix()
         {
             // [SerializeField] _maxHealth → maxHealth
             var test = SerializeFieldAttribute + @"
@@ -34,14 +34,14 @@ public class TestClass
 {
     [UnityEngine.SerializeField] private int maxHealth;
 }";
-            var expected = Verify.Diagnostic("VUA0002")
+            var expected = Verify.Diagnostic("VUA2001")
                 .WithLocation(0)
                 .WithArguments("_maxHealth");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
         [Fact]
-        public async Task VUA0008_AddUnderscorePrefix()
+        public async Task VUA2002_AddUnderscorePrefix()
         {
             // private health → _health
             var test = SerializeFieldAttribute + @"
@@ -54,14 +54,14 @@ public class TestClass
 {
     private int _health;
 }";
-            var expected = Verify.Diagnostic("VUA0008")
+            var expected = Verify.Diagnostic("VUA2002")
                 .WithLocation(0)
                 .WithArguments("health");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
         [Fact]
-        public async Task VUA0008_AddUnderscorePrefix_WithInitializer()
+        public async Task VUA2002_AddUnderscorePrefix_WithInitializer()
         {
             // private count = 0 → _count = 0
             var test = SerializeFieldAttribute + @"
@@ -74,14 +74,14 @@ public class TestClass
 {
     private int _count = 0;
 }";
-            var expected = Verify.Diagnostic("VUA0008")
+            var expected = Verify.Diagnostic("VUA2002")
                 .WithLocation(0)
                 .WithArguments("count");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
         [Fact]
-        public async Task VUA0002_SerializeReference_RemoveUnderscorePrefix()
+        public async Task VUA2001_SerializeReference_RemoveUnderscorePrefix()
         {
             // [SerializeReference] _myRef → myRef
             var test = SerializeFieldAttribute + @"
@@ -94,7 +94,7 @@ public class TestClass
 {
     [UnityEngine.SerializeReference] private object myRef;
 }";
-            var expected = Verify.Diagnostic("VUA0002")
+            var expected = Verify.Diagnostic("VUA2001")
                 .WithLocation(0)
                 .WithArguments("_myRef");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);

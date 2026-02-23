@@ -11,8 +11,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class EnumSummaryAnalyzer : DiagnosticAnalyzer
     {
         // トップレベルenumメンバーにはXMLドキュメントコメントを必須とする
-        public static readonly DiagnosticDescriptor VUA0006 = new DiagnosticDescriptor(
-            "VUA0006",
+        public static readonly DiagnosticDescriptor VUA4001 = new DiagnosticDescriptor(
+            "VUA4001",
             "トップレベルenumメンバーには/// <summary>コメントが必要です",
             "enumメンバー '{0}' に/// <summary>コメントを追加してください",
             "Documentation",
@@ -20,7 +20,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0006);
+            ImmutableArray.Create(VUA4001);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -51,7 +51,7 @@ namespace Void2610.Unity.Analyzers
             if (!hasDocComment)
             {
                 var diagnostic = Diagnostic.Create(
-                    VUA0006,
+                    VUA4001,
                     enumMember.Identifier.GetLocation(),
                     enumMember.Identifier.Text);
                 context.ReportDiagnostic(diagnostic);

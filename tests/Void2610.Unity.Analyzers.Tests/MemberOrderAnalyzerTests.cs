@@ -62,7 +62,7 @@ public class TestClass
         }
 
         [Fact]
-        public async Task SerializeFieldAfterConstants_VUA0005()
+        public async Task SerializeFieldAfterConstants_VUA3002()
         {
             // SerializeFieldがconstantsより後にある
             var test = @"
@@ -76,14 +76,14 @@ public class TestClass
 
     [SerializeField] private int {|#0:health|};
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("health", "SerializeField", "constants");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task PublicPropertyAfterPrivateField_VUA0005()
+        public async Task PublicPropertyAfterPrivateField_VUA3002()
         {
             // public propertyがprivate fieldより後にある
             var test = @"
@@ -93,14 +93,14 @@ public class TestClass
 
     public int {|#0:Value|} { get; set; }
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("Value", "public properties", "private fields");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task UnityEventFollowedByPrivateMethod_VUA0005()
+        public async Task UnityEventFollowedByPrivateMethod_VUA3002()
         {
             // Unity eventの後にprivate methodがある
             var test = @"
@@ -118,14 +118,14 @@ public class TestClass
         _count = 1;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("Helper", "private methods", "Unity events");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task CleanupFollowedByUnityEvent_VUA0005()
+        public async Task CleanupFollowedByUnityEvent_VUA3002()
         {
             // cleanupの後にUnity eventがある
             var test = @"
@@ -143,14 +143,14 @@ public class TestClass
         _count = 1;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("Awake", "Unity events", "cleanup");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task ExpressionBodyPublicAfterBlockBodyPublic_VUA0005()
+        public async Task ExpressionBodyPublicAfterBlockBodyPublic_VUA3002()
         {
             // 式本体publicがブロック本体publicより後にある
             var test = @"
@@ -166,7 +166,7 @@ public class TestClass
 
     public int {|#0:GetValue|}() => _count;
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("GetValue", "public methods (one line)", "public methods (multi line)");
             await Verify.VerifyAnalyzerAsync(test, expected);
@@ -192,7 +192,7 @@ public class TestClass
         }
 
         [Fact]
-        public async Task ConstructorAfterPublicMethods_VUA0005()
+        public async Task ConstructorAfterPublicMethods_VUA3002()
         {
             // コンストラクタがpublic methodsの後にある
             var test = @"
@@ -207,7 +207,7 @@ public class TestClass
         _count = count;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("TestClass", "constructors", "public methods (one line)");
             await Verify.VerifyAnalyzerAsync(test, expected);
@@ -328,7 +328,7 @@ public struct TestStruct
         }
 
         [Fact]
-        public async Task StructMembers_WrongOrder_VUA0005()
+        public async Task StructMembers_WrongOrder_VUA3002()
         {
             // 構造体の順序違反
             var test = @"
@@ -338,7 +338,7 @@ public struct TestStruct
 
     public int {|#0:Value|} { get; set; }
 }";
-            var expected = Verify.Diagnostic("VUA0005")
+            var expected = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("Value", "public properties", "private fields");
             await Verify.VerifyAnalyzerAsync(test, expected);
@@ -384,10 +384,10 @@ public class TestClass
 
     public int {|#1:Value|} { get; set; }
 }";
-            var expected0 = Verify.Diagnostic("VUA0005")
+            var expected0 = Verify.Diagnostic("VUA3002")
                 .WithLocation(0)
                 .WithArguments("_count", "private fields", "Unity events");
-            var expected1 = Verify.Diagnostic("VUA0005")
+            var expected1 = Verify.Diagnostic("VUA3002")
                 .WithLocation(1)
                 .WithArguments("Value", "public properties", "Unity events");
             await Verify.VerifyAnalyzerAsync(test, expected0, expected1);

@@ -10,8 +10,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class StartCoroutineAnalyzer : DiagnosticAnalyzer
     {
         // コルーチン(StartCoroutine)の使用を禁止し、UniTaskなどの代替を推奨
-        public static readonly DiagnosticDescriptor VUA0009 = new DiagnosticDescriptor(
-            "VUA0009",
+        public static readonly DiagnosticDescriptor VUA1004 = new DiagnosticDescriptor(
+            "VUA1004",
             "コルーチンの使用は禁止されています",
             "StartCoroutine の呼び出しを削除し、UniTask などの代替手段を使用してください",
             "Design",
@@ -19,7 +19,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0009);
+            ImmutableArray.Create(VUA1004);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -49,7 +49,7 @@ namespace Void2610.Unity.Analyzers
             if (methodName == "StartCoroutine")
             {
                 context.ReportDiagnostic(Diagnostic.Create(
-                    VUA0009,
+                    VUA1004,
                     invocation.GetLocation()));
             }
         }

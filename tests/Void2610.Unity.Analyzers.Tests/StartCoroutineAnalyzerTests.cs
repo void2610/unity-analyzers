@@ -28,7 +28,7 @@ namespace UnityEngine
 ";
 
         [Fact]
-        public async Task StartCoroutineWithMemberAccess_VUA0009()
+        public async Task StartCoroutineWithMemberAccess_VUA1004()
         {
             // this.StartCoroutine(...) → 検出
             var test = MonoBehaviourStub + @"
@@ -40,13 +40,13 @@ public class TestClass : UnityEngine.MonoBehaviour
     }
     private IEnumerator MyCoroutine() { yield break; }
 }";
-            var expected = Verify.Diagnostic("VUA0009")
+            var expected = Verify.Diagnostic("VUA1004")
                 .WithLocation(0);
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task StartCoroutineWithoutThis_VUA0009()
+        public async Task StartCoroutineWithoutThis_VUA1004()
         {
             // StartCoroutine(...) (thisなし) → 検出
             var test = MonoBehaviourStub + @"
@@ -58,13 +58,13 @@ public class TestClass : UnityEngine.MonoBehaviour
     }
     private IEnumerator MyCoroutine() { yield break; }
 }";
-            var expected = Verify.Diagnostic("VUA0009")
+            var expected = Verify.Diagnostic("VUA1004")
                 .WithLocation(0);
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task StartCoroutineWithStringArg_VUA0009()
+        public async Task StartCoroutineWithStringArg_VUA1004()
         {
             // StartCoroutine("MethodName") → 検出
             var test = MonoBehaviourStub + @"
@@ -76,13 +76,13 @@ public class TestClass : UnityEngine.MonoBehaviour
     }
     private IEnumerator MyCoroutine() { yield break; }
 }";
-            var expected = Verify.Diagnostic("VUA0009")
+            var expected = Verify.Diagnostic("VUA1004")
                 .WithLocation(0);
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task StartCoroutineOnOtherObject_VUA0009()
+        public async Task StartCoroutineOnOtherObject_VUA1004()
         {
             // other.StartCoroutine(...) → 検出
             var test = MonoBehaviourStub + @"
@@ -95,7 +95,7 @@ public class TestClass : UnityEngine.MonoBehaviour
     }
     private IEnumerator MyCoroutine() { yield break; }
 }";
-            var expected = Verify.Diagnostic("VUA0009")
+            var expected = Verify.Diagnostic("VUA1004")
                 .WithLocation(0);
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
@@ -116,7 +116,7 @@ public class TestClass : UnityEngine.MonoBehaviour
         }
 
         [Fact]
-        public async Task UserDefinedStartCoroutine_VUA0009()
+        public async Task UserDefinedStartCoroutine_VUA1004()
         {
             // MonoBehaviour以外のクラスでもStartCoroutineという名前なら検出
             var test = @"
@@ -128,7 +128,7 @@ public class MyClass
         {|#0:StartCoroutine(""test"")|};
     }
 }";
-            var expected = Verify.Diagnostic("VUA0009")
+            var expected = Verify.Diagnostic("VUA1004")
                 .WithLocation(0);
             await Verify.VerifyAnalyzerAsync(test, expected);
         }

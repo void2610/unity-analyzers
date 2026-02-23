@@ -11,7 +11,7 @@ namespace Void2610.Unity.Analyzers.Tests
     public class ExpressionBodyAnalyzerTests
     {
         [Fact]
-        public async Task PublicMethodSingleStatement_VUA0004()
+        public async Task PublicMethodSingleStatement_VUA3001()
         {
             var test = @"
 public class TestClass
@@ -21,14 +21,14 @@ public class TestClass
         return 42;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0004")
+            var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
                 .WithArguments("GetValue");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]
-        public async Task PublicVoidMethodSingleStatement_VUA0004()
+        public async Task PublicVoidMethodSingleStatement_VUA3001()
         {
             var test = @"
 public class TestClass
@@ -39,7 +39,7 @@ public class TestClass
         _value = v;
     }
 }";
-            var expected = Verify.Diagnostic("VUA0004")
+            var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
                 .WithArguments("SetValue");
             await Verify.VerifyAnalyzerAsync(test, expected);

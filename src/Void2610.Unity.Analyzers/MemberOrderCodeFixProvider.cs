@@ -16,7 +16,7 @@ namespace Void2610.Unity.Analyzers
     public sealed class MemberOrderCodeFixProvider : CodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds =>
-            ImmutableArray.Create("VUA0005");
+            ImmutableArray.Create("VUA3002");
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 

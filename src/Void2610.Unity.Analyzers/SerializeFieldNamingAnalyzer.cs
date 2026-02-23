@@ -9,8 +9,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class SerializeFieldNamingAnalyzer : DiagnosticAnalyzer
     {
         // 通常のprivateフィールドに_プレフィックスがない場合の警告
-        public static readonly DiagnosticDescriptor VUA0008 = new DiagnosticDescriptor(
-            "VUA0008",
+        public static readonly DiagnosticDescriptor VUA2002 = new DiagnosticDescriptor(
+            "VUA2002",
             "privateフィールドには'_'プレフィックスが必要です",
             "privateフィールド '{0}' には '_' プレフィックスを付けてください",
             "Naming",
@@ -18,8 +18,8 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         // [SerializeField]付きフィールドに_プレフィックスがある場合の警告
-        public static readonly DiagnosticDescriptor VUA0002 = new DiagnosticDescriptor(
-            "VUA0002",
+        public static readonly DiagnosticDescriptor VUA2001 = new DiagnosticDescriptor(
+            "VUA2001",
             "[SerializeField]フィールドには'_'プレフィックスを付けないでください",
             "[SerializeField]フィールド '{0}' から '_' プレフィックスを除去してください",
             "Naming",
@@ -27,7 +27,7 @@ namespace Void2610.Unity.Analyzers
             isEnabledByDefault: true);
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0008, VUA0002);
+            ImmutableArray.Create(VUA2002, VUA2001);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -61,7 +61,7 @@ namespace Void2610.Unity.Analyzers
                 if (startsWithUnderscore)
                 {
                     context.ReportDiagnostic(
-                        Diagnostic.Create(VUA0002, field.Locations[0], field.Name));
+                        Diagnostic.Create(VUA2001, field.Locations[0], field.Name));
                 }
             }
             else
@@ -70,7 +70,7 @@ namespace Void2610.Unity.Analyzers
                 if (!startsWithUnderscore)
                 {
                     context.ReportDiagnostic(
-                        Diagnostic.Create(VUA0008, field.Locations[0], field.Name));
+                        Diagnostic.Create(VUA2002, field.Locations[0], field.Name));
                 }
             }
         }

@@ -12,8 +12,8 @@ namespace Void2610.Unity.Analyzers
     public sealed class MemberOrderAnalyzer : DiagnosticAnalyzer
     {
         // クラスメンバーの宣言順序違反
-        public static readonly DiagnosticDescriptor VUA0005 = new DiagnosticDescriptor(
-            "VUA0005",
+        public static readonly DiagnosticDescriptor VUA3002 = new DiagnosticDescriptor(
+            "VUA3002",
             "クラスメンバーの宣言順序が不正です",
             "メンバー '{0}' ({1}) は '{2}' より前に宣言してください",
             "Style",
@@ -82,7 +82,7 @@ namespace Void2610.Unity.Analyzers
         };
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA0005);
+            ImmutableArray.Create(VUA3002);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -132,7 +132,7 @@ namespace Void2610.Unity.Analyzers
                         : GetMemberIdentifierLocation(current.Member);
 
                     context.ReportDiagnostic(Diagnostic.Create(
-                        VUA0005,
+                        VUA3002,
                         location,
                         current.Name,
                         CategoryNames[current.Category],
