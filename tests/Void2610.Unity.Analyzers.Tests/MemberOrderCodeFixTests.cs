@@ -184,5 +184,6 @@ public class TestClass
                 .WithArguments("_b");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
+
     }
 }

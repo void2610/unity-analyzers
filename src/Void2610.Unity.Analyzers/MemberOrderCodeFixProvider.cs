@@ -106,14 +106,18 @@ namespace Void2610.Unity.Analyzers
 
                 var previousCategory = MemberOrderAnalyzer.ClassifyMember(previous);
                 var currentCategory = MemberOrderAnalyzer.ClassifyMember(current);
+                var previousIsFieldGroup = MemberOrderAnalyzer.IsFieldGroupCategory(previousCategory);
+                var currentIsFieldGroup = MemberOrderAnalyzer.IsFieldGroupCategory(currentCategory);
+                if (!previousIsFieldGroup || !currentIsFieldGroup)
+                {
+                    continue;
+                }
 
                 var previousEndLine = syntaxTree.GetLineSpan(previous.Span).EndLinePosition.Line;
                 var currentStartLine = MemberOrderAnalyzer.GetMemberAnchorLine(syntaxTree, sourceText, current);
                 var blankLines = currentStartLine - previousEndLine - 1;
 
-                var requiresSingleBlankLine =
-                    previousCategory == MemberOrderAnalyzer.MemberCategory.Constant &&
-                    currentCategory == MemberOrderAnalyzer.MemberCategory.PrivateField;
+                var requiresSingleBlankLine = previousCategory != currentCategory;
 
                 var desiredBlankLines = blankLines;
                 if (blankLines > 1)

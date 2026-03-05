@@ -155,9 +155,9 @@ namespace Void2610.Unity.Analyzers
                 }
             }
 
-            // 空行ルールチェック:
-            // 1. const/static readonly と private field の間は空行1行
-            // 2. 連続空行2行以上は禁止（空行は最大1行）
+            // 空行ルールチェック（定数/通常フィールドカテゴリのみ）:
+            // 1. Constant <-> PrivateField の境界は空行1行
+            // 2. 同一カテゴリ内の連続空行2行以上は禁止
             AnalyzeMemberSpacing(context, categorizedMembers);
         }
 
@@ -182,13 +182,18 @@ namespace Void2610.Unity.Analyzers
                 var currentStartLine = GetMemberAnchorLine(syntaxTree, sourceText, current.Member);
                 var blankLines = currentStartLine - previousEndLine - 1;
 
-                var requiresSingleBlankLine =
-                    previous.Category == MemberCategory.Constant &&
-                    current.Category == MemberCategory.PrivateField;
+                var previousIsFieldGroup = IsFieldGroupCategory(previous.Category);
+                var currentIsFieldGroup = IsFieldGroupCategory(current.Category);
+                if (!previousIsFieldGroup || !currentIsFieldGroup)
+                {
+                    continue;
+                }
+
+                var requiresSingleBlankLine = previous.Category != current.Category;
 
                 var hasViolation =
-                    blankLines > 1 ||
-                    (requiresSingleBlankLine && blankLines != 1);
+                    (requiresSingleBlankLine && blankLines != 1) ||
+                    (!requiresSingleBlankLine && blankLines > 1);
 
                 if (!hasViolation)
                 {
@@ -227,6 +232,12 @@ namespace Void2610.Unity.Analyzers
             }
 
             return sourceText.Lines.GetLineFromPosition(anchorPosition).LineNumber;
+        }
+
+        internal static bool IsFieldGroupCategory(MemberCategory category)
+        {
+            return category == MemberCategory.Constant
+                || category == MemberCategory.PrivateField;
         }
 
         internal static MemberCategory ClassifyMember(MemberDeclarationSyntax member)
