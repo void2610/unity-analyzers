@@ -9,6 +9,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Void2610.Unity.Analyzers
 {
@@ -16,7 +17,7 @@ namespace Void2610.Unity.Analyzers
     public sealed class MemberOrderCodeFixProvider : CodeFixProvider
     {
         public override ImmutableArray<string> FixableDiagnosticIds =>
-            ImmutableArray.Create("VUA3002");
+            ImmutableArray.Create("VUA3002", "VUA3003");
 
         public override FixAllProvider GetFixAllProvider() => WellKnownFixAllProviders.BatchFixer;
 
@@ -32,13 +33,13 @@ namespace Void2610.Unity.Analyzers
 
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    "メンバーの宣言順序を修正",
-                    ct => ReorderMembersAsync(context.Document, typeDeclaration, ct),
+                    "メンバー順序・空行を修正",
+                    ct => FixMembersAsync(context.Document, typeDeclaration, ct),
                     nameof(MemberOrderCodeFixProvider)),
                 diagnostic);
         }
 
-        private static async Task<Document> ReorderMembersAsync(
+        private static async Task<Document> FixMembersAsync(
             Document document, TypeDeclarationSyntax typeDeclaration, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -76,7 +77,82 @@ namespace Void2610.Unity.Analyzers
             var newTypeDeclaration = typeDeclaration.WithMembers(newMembers);
 
             var newRoot = root.ReplaceNode(typeDeclaration, newTypeDeclaration);
-            return document.WithSyntaxRoot(newRoot);
+            var updatedDocument = document.WithSyntaxRoot(newRoot);
+            return await NormalizeMemberSpacingAsync(updatedDocument, newTypeDeclaration, cancellationToken).ConfigureAwait(false);
+        }
+
+        private static async Task<Document> NormalizeMemberSpacingAsync(
+            Document document, TypeDeclarationSyntax typeDeclaration, CancellationToken cancellationToken)
+        {
+            var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
+            var currentType = root.FindNode(typeDeclaration.Span).FirstAncestorOrSelf<TypeDeclarationSyntax>() ?? typeDeclaration;
+            var members = currentType.Members;
+            if (members.Count <= 1)
+            {
+                return document;
+            }
+
+            var syntaxTree = root.SyntaxTree;
+            var sourceText = await document.GetTextAsync(cancellationToken).ConfigureAwait(false);
+            var lineBreak = sourceText.Lines.Count > 1
+                ? sourceText.ToString(TextSpan.FromBounds(sourceText.Lines[0].End, sourceText.Lines[1].Start))
+                : "\n";
+
+            var changes = new List<TextChange>();
+            for (var i = 1; i < members.Count; i++)
+            {
+                var previous = members[i - 1];
+                var current = members[i];
+
+                var previousCategory = MemberOrderAnalyzer.ClassifyMember(previous);
+                var currentCategory = MemberOrderAnalyzer.ClassifyMember(current);
+
+                var previousEndLine = syntaxTree.GetLineSpan(previous.Span).EndLinePosition.Line;
+                var currentStartLine = MemberOrderAnalyzer.GetMemberAnchorLine(syntaxTree, sourceText, current);
+                var blankLines = currentStartLine - previousEndLine - 1;
+
+                var requiresSingleBlankLine =
+                    previousCategory == MemberOrderAnalyzer.MemberCategory.Constant &&
+                    currentCategory == MemberOrderAnalyzer.MemberCategory.PrivateField;
+
+                var desiredBlankLines = blankLines;
+                if (blankLines > 1)
+                {
+                    desiredBlankLines = 1;
+                }
+
+                if (requiresSingleBlankLine)
+                {
+                    desiredBlankLines = 1;
+                }
+
+                if (desiredBlankLines == blankLines)
+                {
+                    continue;
+                }
+
+                if (previousEndLine < 0 || currentStartLine < 0 ||
+                    previousEndLine >= sourceText.Lines.Count || currentStartLine >= sourceText.Lines.Count ||
+                    previousEndLine >= currentStartLine)
+                {
+                    continue;
+                }
+
+                var replaceSpan = TextSpan.FromBounds(
+                    sourceText.Lines[previousEndLine].End,
+                    sourceText.Lines[currentStartLine].Start);
+
+                var newSeparator = string.Concat(Enumerable.Repeat(lineBreak, desiredBlankLines + 1));
+                changes.Add(new TextChange(replaceSpan, newSeparator));
+            }
+
+            if (changes.Count == 0)
+            {
+                return document;
+            }
+
+            var newText = sourceText.WithChanges(changes.OrderByDescending(change => change.Span.Start));
+            return document.WithText(newText);
         }
     }
 }

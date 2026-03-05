@@ -106,5 +106,83 @@ public class TestClass
                 .WithArguments("Awake", "Unity events", "cleanup");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
+
+        [Fact]
+        public async Task ConstAndPrivateFieldSpacing_Normalized()
+        {
+            var test = @"
+public class TestClass
+{
+    private const int MaxValue = 1;
+    private int {|#0:_count|};
+}";
+
+            var fixedCode = @"
+public class TestClass
+{
+    private const int MaxValue = 1;
+
+    private int _count;
+}";
+
+            var expected = Verify.Diagnostic("VUA3003")
+                .WithLocation(0)
+                .WithArguments("_count");
+            await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
+        }
+
+        [Fact]
+        public async Task MultipleBlankLinesSpacing_Normalized()
+        {
+            var test = @"
+public class TestClass
+{
+    private int _a;
+
+
+    private int {|#0:_b|};
+}";
+
+            var fixedCode = @"
+public class TestClass
+{
+    private int _a;
+
+    private int _b;
+}";
+
+            var expected = Verify.Diagnostic("VUA3003")
+                .WithLocation(0)
+                .WithArguments("_b");
+            await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
+        }
+
+        [Fact]
+        public async Task MultipleBlankLinesBeforeXmlDoc_XmlDocPreserved()
+        {
+            var test = @"
+public class TestClass
+{
+    private int _a;
+
+
+    /// <summary>doc</summary>
+    private int {|#0:_b|};
+}";
+
+            var fixedCode = @"
+public class TestClass
+{
+    private int _a;
+
+    /// <summary>doc</summary>
+    private int _b;
+}";
+
+            var expected = Verify.Diagnostic("VUA3003")
+                .WithLocation(0)
+                .WithArguments("_b");
+            await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
+        }
     }
 }

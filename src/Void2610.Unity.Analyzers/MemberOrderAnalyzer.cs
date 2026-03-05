@@ -5,6 +5,7 @@ using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
 using Microsoft.CodeAnalysis.Diagnostics;
+using Microsoft.CodeAnalysis.Text;
 
 namespace Void2610.Unity.Analyzers
 {
@@ -16,6 +17,15 @@ namespace Void2610.Unity.Analyzers
             "VUA3002",
             "クラスメンバーの宣言順序が不正です",
             "メンバー '{0}' ({1}) は '{2}' より前に宣言してください",
+            "Style",
+            DiagnosticSeverity.Warning,
+            isEnabledByDefault: true);
+
+        // クラスメンバー間の空行ルール違反
+        public static readonly DiagnosticDescriptor VUA3003 = new DiagnosticDescriptor(
+            "VUA3003",
+            "クラスメンバー間の空行が不正です",
+            "メンバー '{0}' の前の空行ルールに違反しています",
             "Style",
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
@@ -82,7 +92,7 @@ namespace Void2610.Unity.Analyzers
         };
 
         public override ImmutableArray<DiagnosticDescriptor> SupportedDiagnostics =>
-            ImmutableArray.Create(VUA3002);
+            ImmutableArray.Create(VUA3002, VUA3003);
 
         public override void Initialize(AnalysisContext context)
         {
@@ -144,6 +154,79 @@ namespace Void2610.Unity.Analyzers
                     maxCategoryName = CategoryNames[maxCategory];
                 }
             }
+
+            // 空行ルールチェック:
+            // 1. const/static readonly と private field の間は空行1行
+            // 2. 連続空行2行以上は禁止（空行は最大1行）
+            AnalyzeMemberSpacing(context, categorizedMembers);
+        }
+
+        private static void AnalyzeMemberSpacing(
+            SyntaxNodeAnalysisContext context,
+            List<(MemberDeclarationSyntax Member, MemberCategory Category, string Name)> members)
+        {
+            if (members.Count <= 1)
+            {
+                return;
+            }
+
+            var syntaxTree = context.Node.SyntaxTree;
+            var sourceText = syntaxTree.GetText(context.CancellationToken);
+
+            for (var i = 1; i < members.Count; i++)
+            {
+                var previous = members[i - 1];
+                var current = members[i];
+
+                var previousEndLine = syntaxTree.GetLineSpan(previous.Member.Span).EndLinePosition.Line;
+                var currentStartLine = GetMemberAnchorLine(syntaxTree, sourceText, current.Member);
+                var blankLines = currentStartLine - previousEndLine - 1;
+
+                var requiresSingleBlankLine =
+                    previous.Category == MemberCategory.Constant &&
+                    current.Category == MemberCategory.PrivateField;
+
+                var hasViolation =
+                    blankLines > 1 ||
+                    (requiresSingleBlankLine && blankLines != 1);
+
+                if (!hasViolation)
+                {
+                    continue;
+                }
+
+                var location = current.Member switch
+                {
+                    FieldDeclarationSyntax field => field.Declaration.Variables.First().Identifier.GetLocation(),
+                    _ => GetMemberIdentifierLocation(current.Member)
+                };
+
+                context.ReportDiagnostic(Diagnostic.Create(
+                    VUA3003,
+                    location,
+                    current.Name));
+            }
+        }
+
+        internal static int GetMemberAnchorLine(
+            SyntaxTree syntaxTree,
+            SourceText sourceText,
+            MemberDeclarationSyntax member)
+        {
+            var fullSpan = member.FullSpan;
+            var declarationSpan = member.Span;
+
+            var anchorPosition = declarationSpan.Start;
+            for (var position = fullSpan.Start; position < declarationSpan.Start; position++)
+            {
+                if (!char.IsWhiteSpace(sourceText[position]))
+                {
+                    anchorPosition = position;
+                    break;
+                }
+            }
+
+            return sourceText.Lines.GetLineFromPosition(anchorPosition).LineNumber;
         }
 
         internal static MemberCategory ClassifyMember(MemberDeclarationSyntax member)

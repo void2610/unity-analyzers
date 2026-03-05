@@ -452,5 +452,39 @@ public class TestClass
 }";
             await Verify.VerifyAnalyzerAsync(test);
         }
+
+        [Fact]
+        public async Task ConstAndPrivateFieldWithoutBlankLine_VUA3003()
+        {
+            var test = @"
+public class TestClass
+{
+    private const int MaxValue = 1;
+    private int {|#0:_count|};
+}";
+
+            var expected = Verify.Diagnostic("VUA3003")
+                .WithLocation(0)
+                .WithArguments("_count");
+            await Verify.VerifyAnalyzerAsync(test, expected);
+        }
+
+        [Fact]
+        public async Task MultipleBlankLinesBetweenMembers_VUA3003()
+        {
+            var test = @"
+public class TestClass
+{
+    private int _a;
+
+
+    private int {|#0:_b|};
+}";
+
+            var expected = Verify.Diagnostic("VUA3003")
+                .WithLocation(0)
+                .WithArguments("_b");
+            await Verify.VerifyAnalyzerAsync(test, expected);
+        }
     }
 }
