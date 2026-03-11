@@ -32,7 +32,7 @@ public class TestComponent
 
     public void Method()
     {
-        {|#0:if (target) target.ToString();|}
+        if ({|#0:target|}) target.ToString();
     }
 }";
             var fixedCode = SerializeFieldAttribute + @"
@@ -61,10 +61,10 @@ public class TestComponent
 
     public void Method()
     {
-        {|#0:if (target)
+        if ({|#0:target|})
         {
             target.ToString();
-        }|}
+        }
     }
 }";
             var expected = Verify.Diagnostic("VUA1001")
