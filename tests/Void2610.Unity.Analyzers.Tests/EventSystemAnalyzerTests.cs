@@ -56,18 +56,15 @@ public class TestClass
         }
 
         [Fact]
-        public async Task FuncProperty_VUA1002()
+        public async Task FuncProperty_NoDiagnostic()
         {
             var test = @"
 using System;
 public class TestClass
 {
-    public Func<int> {|#0:GetValue|} { get; set; }
+    public Func<int> GetValue { get; set; }
 }";
-            var expected = Verify.Diagnostic("VUA1002")
-                .WithLocation(0)
-                .WithArguments("GetValue");
-            await Verify.VerifyAnalyzerAsync(test, expected);
+            await Verify.VerifyAnalyzerAsync(test);
         }
 
         [Fact]

@@ -86,12 +86,10 @@ namespace Void2610.Unity.Analyzers
         private static void AnalyzeIfStatement(SyntaxNodeAnalysisContext context)
         {
             var ifStatement = (IfStatementSyntax)context.Node;
-            var target = GetNullGuardLikeConditionTarget(ifStatement.Condition);
-
-            if (target == null)
-                return;
-
-            ReportIfSerializeField(context, target, ifStatement.Condition.GetLocation());
+            foreach (var target in EnumerateNullGuardLikeConditionTargets(ifStatement.Condition))
+            {
+                ReportIfSerializeField(context, target, target.GetLocation());
+            }
         }
 
         private static void ReportIfSerializeField(
@@ -115,21 +113,37 @@ namespace Void2610.Unity.Analyzers
             }
         }
 
-        private static ExpressionSyntax GetNullGuardLikeConditionTarget(ExpressionSyntax condition)
+        private static System.Collections.Generic.IEnumerable<ExpressionSyntax> EnumerateNullGuardLikeConditionTargets(ExpressionSyntax condition)
         {
             while (condition is ParenthesizedExpressionSyntax parenthesized)
                 condition = parenthesized.Expression;
 
+            if (condition is BinaryExpressionSyntax binary &&
+                (binary.IsKind(SyntaxKind.LogicalAndExpression) || binary.IsKind(SyntaxKind.LogicalOrExpression)))
+            {
+                foreach (var left in EnumerateNullGuardLikeConditionTargets(binary.Left))
+                    yield return left;
+
+                foreach (var right in EnumerateNullGuardLikeConditionTargets(binary.Right))
+                    yield return right;
+
+                yield break;
+            }
+
             if (condition is PrefixUnaryExpressionSyntax prefixUnary &&
                 prefixUnary.IsKind(SyntaxKind.LogicalNotExpression))
             {
-                condition = prefixUnary.Operand;
+                foreach (var operand in EnumerateNullGuardLikeConditionTargets(prefixUnary.Operand))
+                    yield return operand;
+
+                yield break;
             }
 
             while (condition is ParenthesizedExpressionSyntax parenthesized)
                 condition = parenthesized.Expression;
 
-            return condition is IdentifierNameSyntax or MemberAccessExpressionSyntax ? condition : null;
+            if (condition is IdentifierNameSyntax or MemberAccessExpressionSyntax)
+                yield return condition;
         }
 
         private static bool IsNullLiteral(ExpressionSyntax expression) =>

@@ -51,7 +51,7 @@ namespace Void2610.Unity.Analyzers
             if (field.IsImplicitlyDeclared)
                 return;
 
-            if (IsActionOrFuncType(field.Type))
+            if (IsActionType(field.Type))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(VUA1002, field.Locations[0], field.Name));
@@ -63,14 +63,14 @@ namespace Void2610.Unity.Analyzers
             if (GeneratedCodeHelper.IsGenerated(context.Symbol)) return;
             var property = (IPropertySymbol)context.Symbol;
 
-            if (IsActionOrFuncType(property.Type))
+            if (IsActionType(property.Type))
             {
                 context.ReportDiagnostic(
                     Diagnostic.Create(VUA1002, property.Locations[0], property.Name));
             }
         }
 
-        private static bool IsActionOrFuncType(ITypeSymbol type)
+        private static bool IsActionType(ITypeSymbol type)
         {
             if (type == null)
                 return false;
@@ -78,8 +78,7 @@ namespace Void2610.Unity.Analyzers
             var name = type.Name;
             var ns = type.ContainingNamespace?.ToDisplayString();
 
-            // System.Action, System.Action<T>, System.Func<T> を検出
-            return ns == "System" && (name == "Action" || name == "Func");
+            return ns == "System" && name == "Action";
         }
     }
 }

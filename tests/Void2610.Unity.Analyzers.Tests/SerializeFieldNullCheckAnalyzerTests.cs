@@ -262,13 +262,63 @@ public class TestComponent
     [UnityEngine.SerializeField] private UnityEngine.Object target;
     public void Method()
     {
-        if ({|#0:!target|}) return;
+        if (!{|#0:target|}) return;
     }
 }";
             var expected = Verify.Diagnostic("VUA1001")
                 .WithLocation(0)
                 .WithArguments("target");
             await Verify.VerifyAnalyzerAsync(test, expected);
+        }
+
+        [Fact]
+        public async Task SerializeFieldImplicitBoolInLogicalAnd_VUA1001()
+        {
+            var test = SerializeFieldAttribute + @"
+public class RuntimeController : UnityEngine.Object { }
+
+public class TestComponent
+{
+    [UnityEngine.SerializeField] private UnityEngine.Object target;
+    [UnityEngine.SerializeField] private RuntimeController controller;
+
+    public void Method()
+    {
+        if ({|#0:target|} && {|#1:controller|}) return;
+    }
+}";
+            var expectedTarget = Verify.Diagnostic("VUA1001")
+                .WithLocation(0)
+                .WithArguments("target");
+            var expectedController = Verify.Diagnostic("VUA1001")
+                .WithLocation(1)
+                .WithArguments("controller");
+            await Verify.VerifyAnalyzerAsync(test, expectedTarget, expectedController);
+        }
+
+        [Fact]
+        public async Task SerializeFieldImplicitBoolInLogicalOr_VUA1001()
+        {
+            var test = SerializeFieldAttribute + @"
+public class RuntimeController : UnityEngine.Object { }
+
+public class TestComponent
+{
+    [UnityEngine.SerializeField] private UnityEngine.Object target;
+    [UnityEngine.SerializeField] private RuntimeController controller;
+
+    public void Method()
+    {
+        if (!{|#0:target|} || !{|#1:controller|}) return;
+    }
+}";
+            var expectedTarget = Verify.Diagnostic("VUA1001")
+                .WithLocation(0)
+                .WithArguments("target");
+            var expectedController = Verify.Diagnostic("VUA1001")
+                .WithLocation(1)
+                .WithArguments("controller");
+            await Verify.VerifyAnalyzerAsync(test, expectedTarget, expectedController);
         }
 
         [Fact]
