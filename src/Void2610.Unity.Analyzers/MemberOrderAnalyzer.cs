@@ -258,6 +258,12 @@ namespace Void2610.Unity.Analyzers
             return sourceText.Lines.GetLineFromPosition(anchorPosition).LineNumber;
         }
 
+        internal static bool IsUnityEventMethod(MethodDeclarationSyntax method) =>
+            UnityEventNames.Contains(method.Identifier.Text);
+
+        internal static bool IsCleanupMethod(MethodDeclarationSyntax method) =>
+            CleanupNames.Contains(method.Identifier.Text);
+
         internal static bool IsFieldGroupCategory(MemberCategory category)
         {
             return category == MemberCategory.Constant

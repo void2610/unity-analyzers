@@ -28,7 +28,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("GetValue");
+                .WithArguments("GetValue", "メソッド 'GetValue' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
@@ -53,7 +53,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("SetValue");
+                .WithArguments("SetValue", "メソッド 'SetValue' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
@@ -78,7 +78,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("Execute");
+                .WithArguments("Execute", "メソッド 'Execute' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
@@ -98,7 +98,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("GetValue");
+                .WithArguments("GetValue", "メソッド 'GetValue' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
 
@@ -113,6 +113,54 @@ public class TestClass
         int value) => value;
 }";
             await Verify.VerifyCodeFixAsync(test, test);
+        }
+
+        [Fact]
+        public async Task PrivateExpressionBody_ConvertedToBlockBody()
+        {
+            var test = @"
+public class TestClass
+{
+    private int {|#0:GetValue|}() => 42;
+}";
+            var fixedCode = @"
+public class TestClass
+{
+    private int GetValue()
+    {
+        return 42;
+    }
+}";
+            var expected = Verify.Diagnostic("VUA3001")
+                .WithLocation(0)
+                .WithArguments("GetValue", "メソッド 'GetValue' では式本体 (=>) を使用しないでください");
+            await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
+        }
+
+        [Fact]
+        public async Task DisposeExpressionBody_ConvertedToBlockBody()
+        {
+            var test = @"
+public class TestClass
+{
+    public void {|#0:Dispose|}() => Cleanup();
+
+    private void Cleanup() { }
+}";
+            var fixedCode = @"
+public class TestClass
+{
+    public void Dispose()
+    {
+        Cleanup();
+    }
+
+    private void Cleanup() { }
+}";
+            var expected = Verify.Diagnostic("VUA3001")
+                .WithLocation(0)
+                .WithArguments("Dispose", "メソッド 'Dispose' では式本体 (=>) を使用しないでください");
+            await Verify.VerifyCodeFixAsync(test, expected, fixedCode);
         }
     }
 }

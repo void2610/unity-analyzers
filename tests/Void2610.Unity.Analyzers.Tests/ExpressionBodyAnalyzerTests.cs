@@ -23,7 +23,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("GetValue");
+                .WithArguments("GetValue", "メソッド 'GetValue' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
@@ -41,7 +41,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("SetValue");
+                .WithArguments("SetValue", "メソッド 'SetValue' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
@@ -68,7 +68,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("GetValue");
+                .WithArguments("GetValue", "メソッド 'GetValue' は1行の式本体 (=>) で記述してください");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
@@ -96,7 +96,7 @@ public class TestClass
 }";
             var expected = Verify.Diagnostic("VUA3001")
                 .WithLocation(0)
-                .WithArguments("GetValue");
+                .WithArguments("GetValue", "メソッド 'GetValue' では式本体 (=>) を使用しないでください");
             await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
@@ -267,7 +267,7 @@ public class TestClass
         [Fact]
         public async Task PublicDisposeMethod_NoDiagnostic()
         {
-            // IDisposable.Disposeメソッドは除外
+            // ブロック本体なら許可
             var test = @"
 public class TestClass
 {
@@ -278,6 +278,51 @@ public class TestClass
     }
 }";
             await Verify.VerifyAnalyzerAsync(test);
+        }
+
+        [Fact]
+        public async Task PublicDisposeExpressionBody_VUA3001()
+        {
+            var test = @"
+public class TestClass
+{
+    public void {|#0:Dispose|}() => Cleanup();
+
+    private void Cleanup() { }
+}";
+            var expected = Verify.Diagnostic("VUA3001")
+                .WithLocation(0)
+                .WithArguments("Dispose", "メソッド 'Dispose' では式本体 (=>) を使用しないでください");
+            await Verify.VerifyAnalyzerAsync(test, expected);
+        }
+
+        [Fact]
+        public async Task PrivateExpressionBodyMethod_VUA3001()
+        {
+            var test = @"
+public class TestClass
+{
+    private int {|#0:GetValue|}() => 42;
+}";
+            var expected = Verify.Diagnostic("VUA3001")
+                .WithLocation(0)
+                .WithArguments("GetValue", "メソッド 'GetValue' では式本体 (=>) を使用しないでください");
+            await Verify.VerifyAnalyzerAsync(test, expected);
+        }
+
+        [Fact]
+        public async Task UnityEventExpressionBody_VUA3001()
+        {
+            var test = @"
+using System;
+public class TestClass
+{
+    public void {|#0:Awake|}() => Console.WriteLine();
+}";
+            var expected = Verify.Diagnostic("VUA3001")
+                .WithLocation(0)
+                .WithArguments("Awake", "メソッド 'Awake' では式本体 (=>) を使用しないでください");
+            await Verify.VerifyAnalyzerAsync(test, expected);
         }
 
         [Fact]

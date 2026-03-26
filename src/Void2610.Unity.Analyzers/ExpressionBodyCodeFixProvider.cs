@@ -7,6 +7,7 @@ using Microsoft.CodeAnalysis.CodeActions;
 using Microsoft.CodeAnalysis.CodeFixes;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CodeAnalysis.CSharp.Syntax;
+using Microsoft.CodeAnalysis.Formatting;
 
 namespace Void2610.Unity.Analyzers
 {
@@ -30,13 +31,15 @@ namespace Void2610.Unity.Analyzers
 
             context.RegisterCodeFix(
                 CodeAction.Create(
-                    "1行の式本体 (=>) に変換",
-                    ct => ConvertToExpressionBodyAsync(context.Document, method, ct),
+                    method.ExpressionBody != null
+                        ? "ブロック本体に変換"
+                        : "1行の式本体 (=>) に変換",
+                    ct => FixExpressionBodyAsync(context.Document, method, ct),
                     nameof(ExpressionBodyCodeFixProvider)),
                 diagnostic);
         }
 
-        private static async Task<Document> ConvertToExpressionBodyAsync(
+        private static async Task<Document> FixExpressionBodyAsync(
             Document document, MethodDeclarationSyntax method, CancellationToken cancellationToken)
         {
             var root = await document.GetSyntaxRootAsync(cancellationToken).ConfigureAwait(false);
@@ -44,7 +47,9 @@ namespace Void2610.Unity.Analyzers
 
             if (method.ExpressionBody != null)
             {
-                newMethod = CreateSingleLineExpressionBodyMethod(method, method.ExpressionBody.Expression);
+                newMethod = ExpressionBodyAnalyzer.CanUseExpressionBody(method)
+                    ? CreateSingleLineExpressionBodyMethod(method, method.ExpressionBody.Expression)
+                    : CreateBlockBodyMethod(method, method.ExpressionBody.Expression);
             }
             else
             {
@@ -67,7 +72,8 @@ namespace Void2610.Unity.Analyzers
             }
 
             var newRoot = root.ReplaceNode(method, newMethod);
-            return document.WithSyntaxRoot(newRoot);
+            var updatedDocument = document.WithSyntaxRoot(newRoot);
+            return await Formatter.FormatAsync(updatedDocument, cancellationToken: cancellationToken).ConfigureAwait(false);
         }
 
         private static MethodDeclarationSyntax CreateSingleLineExpressionBodyMethod(
@@ -85,6 +91,48 @@ namespace Void2610.Unity.Analyzers
                 .NormalizeWhitespace()
                 .WithLeadingTrivia(leadingTrivia)
                 .WithTrailingTrivia(trailingTrivia);
+        }
+
+        private static MethodDeclarationSyntax CreateBlockBodyMethod(
+            MethodDeclarationSyntax method,
+            ExpressionSyntax expression)
+        {
+            var leadingTrivia = method.GetLeadingTrivia();
+            var trailingTrivia = method.GetTrailingTrivia();
+            StatementSyntax statement = IsExpressionStatementMethod(method)
+                ? SyntaxFactory.ExpressionStatement(expression.WithoutTrivia())
+                : SyntaxFactory.ReturnStatement(expression.WithoutTrivia());
+
+            return method
+                .WithExpressionBody(null)
+                .WithSemicolonToken(default)
+                .WithBody(SyntaxFactory.Block(statement))
+                .WithoutTrivia()
+                .NormalizeWhitespace()
+                .WithLeadingTrivia(leadingTrivia)
+                .WithTrailingTrivia(trailingTrivia);
+        }
+
+        private static bool IsExpressionStatementMethod(MethodDeclarationSyntax method)
+        {
+            if (method.ReturnType is PredefinedTypeSyntax predefinedType &&
+                predefinedType.Keyword.IsKind(SyntaxKind.VoidKeyword))
+            {
+                return true;
+            }
+
+            if (!method.Modifiers.Any(SyntaxKind.AsyncKeyword))
+            {
+                return false;
+            }
+
+            return method.ReturnType switch
+            {
+                IdentifierNameSyntax identifierName => identifierName.Identifier.Text is "Task" or "UniTask" or "ValueTask",
+                QualifiedNameSyntax qualifiedName => qualifiedName.Right.Identifier.Text is "Task" or "UniTask" or "ValueTask",
+                AliasQualifiedNameSyntax aliasQualifiedName => aliasQualifiedName.Name.Identifier.Text is "Task" or "UniTask" or "ValueTask",
+                _ => false
+            };
         }
     }
 }

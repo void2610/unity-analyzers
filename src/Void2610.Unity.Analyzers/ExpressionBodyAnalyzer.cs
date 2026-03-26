@@ -13,8 +13,8 @@ namespace Void2610.Unity.Analyzers
         // 単一文の対象メソッドには式本体を使用し、式本体は1行に収めるよう警告
         public static readonly DiagnosticDescriptor VUA3001 = new DiagnosticDescriptor(
             "VUA3001",
-            "対象メソッドは1行の式本体で記述してください",
-            "メソッド '{0}' は1行の式本体 (=>) で記述してください",
+            "式本体メソッドの使用ルールに違反しています",
+            "{1}",
             "Style",
             DiagnosticSeverity.Warning,
             isEnabledByDefault: true);
@@ -33,9 +33,21 @@ namespace Void2610.Unity.Analyzers
         {
             if (GeneratedCodeHelper.IsGenerated(context.Node.SyntaxTree)) return;
             var method = (MethodDeclarationSyntax)context.Node;
+            var canUseExpressionBody = CanUseExpressionBody(method);
 
             if (method.ExpressionBody != null)
             {
+                if (!canUseExpressionBody)
+                {
+                    var prohibitedExpressionBodyDiagnostic = Diagnostic.Create(
+                        VUA3001,
+                        method.Identifier.GetLocation(),
+                        method.Identifier.Text,
+                        $"メソッド '{method.Identifier.Text}' では式本体 (=>) を使用しないでください");
+                    context.ReportDiagnostic(prohibitedExpressionBodyDiagnostic);
+                    return;
+                }
+
                 // switch式を含む場合は複数行でも許可（ブロック本体パスと一貫性を保つ）
                 if (method.ExpressionBody.DescendantNodes().OfType<SwitchExpressionSyntax>().Any())
                     return;
@@ -62,7 +74,8 @@ namespace Void2610.Unity.Analyzers
                 var expressionBodyDiagnostic = Diagnostic.Create(
                     VUA3001,
                     method.Identifier.GetLocation(),
-                    method.Identifier.Text);
+                    method.Identifier.Text,
+                    $"メソッド '{method.Identifier.Text}' は1行の式本体 (=>) で記述してください");
                 context.ReportDiagnostic(expressionBodyDiagnostic);
                 return;
             }
@@ -75,12 +88,7 @@ namespace Void2610.Unity.Analyzers
             if (method.ContainsDirectives)
                 return;
 
-            // publicメソッドのみ対象
-            if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
-                return;
-
-            // IDisposable.Disposeメソッドは除外
-            if (method.Identifier.Text == "Dispose" && method.ParameterList.Parameters.Count == 0)
+            if (!canUseExpressionBody)
                 return;
 
             // ステートメントが1つだけの場合に警告
@@ -99,8 +107,23 @@ namespace Void2610.Unity.Analyzers
             var diagnostic = Diagnostic.Create(
                 VUA3001,
                 method.Identifier.GetLocation(),
-                method.Identifier.Text);
+                method.Identifier.Text,
+                $"メソッド '{method.Identifier.Text}' は1行の式本体 (=>) で記述してください");
             context.ReportDiagnostic(diagnostic);
+        }
+
+        internal static bool CanUseExpressionBody(MethodDeclarationSyntax method)
+        {
+            if (!method.Modifiers.Any(SyntaxKind.PublicKeyword))
+                return false;
+
+            if (MemberOrderAnalyzer.IsUnityEventMethod(method))
+                return false;
+
+            if (MemberOrderAnalyzer.IsCleanupMethod(method))
+                return false;
+
+            return true;
         }
 
         private static bool IsSingleLineExpressionBody(MethodDeclarationSyntax method)
