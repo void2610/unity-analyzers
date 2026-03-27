@@ -82,7 +82,7 @@ ensure_workflow_file() {
     local workflow_path="${workflow_dir}/format-check.yml"
     local expected_content
     expected_content="$(cat <<'EOF'
-name: Format Check
+name: Format
 
 on:
   push:
@@ -107,6 +107,7 @@ on:
 
 jobs:
   format-check:
+    name: Check
     uses: void2610/unity-coding-standards/.github/workflows/format-check.yml@main
 EOF
 )"

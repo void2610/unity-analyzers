@@ -1,4 +1,9 @@
 <Project>
+    <PropertyGroup>
+        <LangVersion>preview</LangVersion>
+        <BaseIntermediateOutputPath>$(MSBuildThisFileDirectory)../Temp/obj/$(MSBuildProjectName)/</BaseIntermediateOutputPath>
+        <BaseOutputPath>$(MSBuildThisFileDirectory)../Temp/bin/$(MSBuildProjectName)/</BaseOutputPath>
+    </PropertyGroup>
     <ItemGroup>
         <!-- unity-coding-standards のカスタムRoslynアナライザーを読み込む -->
         <Analyzer

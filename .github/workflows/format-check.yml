@@ -1,11 +1,11 @@
-name: Shared Format Check
+name: Shared Format
 
 on:
   workflow_call:
 
 jobs:
   format-check:
-    name: Format Check
+    name: Run
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
