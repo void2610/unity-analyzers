@@ -1,7 +1,7 @@
-# Void2610.Unity.Analyzers
+# unity-coding-standards
 
-Unity プロジェクト向けのカスタム Roslyn アナライザー集です。
-プロジェクト固有のコーディング規約をコンパイル時に自動検証します。
+Unity プロジェクト向けの共有コーディング規約リポジトリです。
+カスタム Roslyn アナライザー、`.editorconfig`、`Directory.Build.props`、`FormatCheck.csproj` をまとめて配布します。
 
 ## ルール一覧
 
@@ -32,10 +32,38 @@ dotnet build -c Release
 1. このリポジトリを Git サブモジュールとして追加します:
 
 ```bash
-git submodule add <repository-url> Assets/Plugins/Analyzers/unity-analyzers
+git submodule add <repository-url> unity-coding-standards
 ```
 
-2. ビルドした DLL を Unity プロジェクトの適切なフォルダに配置し、`.csproj` の `Analyzer` として参照します。
+2. プロジェクトルートで初期化スクリプトを実行します:
+
+```bash
+./unity-coding-standards/scripts/init-unity-project.sh
+```
+
+既存ファイルがあるプロジェクトの移行はこのスクリプトの対象外です。新規セットアップ専用です。
+
+3. 必要なら個別にアナライザー DLL をビルドします:
+
+```bash
+dotnet build -c Release
+```
+
+4. 共有規約を適用した状態で `dotnet format` を実行します:
+
+```bash
+./unity-coding-standards/scripts/run-format.sh
+```
+
+個別コマンドの実行漏れを防ぐため、LLM や自動化からは `run-format.sh` の利用を推奨します。
+
+## 共有ファイル
+
+- `config/.editorconfig`: 命名規則、C# style、フォーマット設定
+- `config/Directory.Build.props`: Analyzer DLL の参照設定
+- `config/FormatCheck.csproj`: `dotnet format` 用の共有プロジェクト
+- `scripts/init-unity-project.sh`: 新規 Unity プロジェクト向け初期化スクリプト
+- `scripts/run-format.sh`: analyzers / whitespace / style をまとめて実行するスクリプト
 
 ## ルールの抑制
 
