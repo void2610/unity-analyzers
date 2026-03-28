@@ -7,6 +7,8 @@ jobs:
   format-check:
     name: Run
     runs-on: ubuntu-latest
+    env:
+      FORMAT_SDK_VERSION: 8.0.123
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -18,8 +20,19 @@ jobs:
         uses: actions/setup-dotnet@v4
         with:
           dotnet-version: |
-            8.0.123
+            ${{ env.FORMAT_SDK_VERSION }}
             7.0.x
+
+      - name: Pin SDK for repo root
+        run: |
+          cat > global.json <<EOF
+          {
+            "sdk": {
+              "version": "${FORMAT_SDK_VERSION}",
+              "rollForward": "disable"
+            }
+          }
+          EOF
 
       - name: Build analyzer
         run: dotnet build unity-coding-standards/src/Void2610.Unity.Analyzers/Void2610.Unity.Analyzers.csproj -c Release
@@ -35,7 +48,7 @@ jobs:
           dotnet --info
           dotnet format --version
           dotnet msbuild FormatCheck.csproj -nologo -getProperty:NETCoreSdkVersion
-          rg -n "dotnet_style_require_accessibility_modifiers" .editorconfig unity-coding-standards/config/.editorconfig
+          grep -n "dotnet_style_require_accessibility_modifiers" .editorconfig unity-coding-standards/config/.editorconfig
 
       - name: Check formatting
         run: ./unity-coding-standards/scripts/run-format.sh --verify-no-changes
